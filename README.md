@@ -1,8 +1,14 @@
-# Router CNC UNAHUR — agente y skill para Claude
+# Viruta
 
-Agente y skill para generar **código G para el router CNC de UNAHUR desde Fusion 360**, siguiendo las indicaciones de la cátedra (los videos usan SolidWorks CAM; acá está traducido a Fusion).
+**Asistente con IA para pasar piezas de Fusion 360 a código G para router CNC.**
 
-Antes de empezar, el agente pregunta **si vas a cortar en el Taller 5 de UNAHUR**: si es así usa las reglas de esa máquina (abajo); si es otra máquina, te pregunta sus datos (controlador, origen, rpm, avances, sujeción) y arma el perfil con vos. También **pregunta qué fresa vas a usar** y adapta pasadas, descargas y avances a esa fresa (por defecto, la del taller: Ø6 mm plana, metal duro, 2 filos).
+Viruta es una skill y un agente para Claude que te acompaña desde la pieza modelada hasta el archivo listo para el pendrive: arma el CAM en Fusion 360, ubica el origen, elige pasadas y pestañas, postprocesa, limpia el archivo y revisa que el código G no tenga errores antes de cortar.
+
+Nació en el **Taller 5 de la Universidad Nacional de Hurlingham (UNAHUR)** como herramienta para estudiantes de Diseño Industrial, y trae cargado el perfil de esa máquina. También sirve para otros talleres: Viruta te pregunta los datos de tu router y arma el perfil con vos.
+
+Antes de empezar, Viruta pregunta **si vas a cortar en el Taller 5 de UNAHUR**: si es así usa las reglas de esa máquina (abajo); si es otra máquina, te pregunta sus datos (controlador, origen, rpm, avances, sujeción) y arma el perfil con vos. También **pregunta qué fresa vas a usar** y adapta pasadas, descargas y avances a esa fresa (por defecto, la del taller: Ø6 mm plana, metal duro, 2 filos).
+
+**Autora:** María Sol Segovia Sánchez ([@sandaviar](https://github.com/sandaviar)) — Licenciatura en Diseño Industrial, UNAHUR.
 
 ## Qué hace
 
@@ -28,10 +34,13 @@ Antes de empezar, el agente pregunta **si vas a cortar en el Taller 5 de UNAHUR*
 ## Estructura
 
 ```
+LICENSE.md                             ← licencia
+README.md
 .claude/
-  agents/router-cnc-unahur.md          ← el agente (Claude Code)
-  skills/router-cnc-fusion/
+  agents/viruta.md          ← el agente (Claude Code)
+  skills/viruta/
     SKILL.md                           ← la skill
+    LICENSE.md                         ← copia de la licencia (va con la skill)
     references/
       reglas-router-unahur.md          ← reglas de la cátedra + términos de SolidWorks
       fusion-pasos.md                  ← paso a paso en Fusion (menús en español)
@@ -44,15 +53,31 @@ Antes de empezar, el agente pregunta **si vas a cortar en el Taller 5 de UNAHUR*
 
 ## Cómo usarlo
 
-**En Claude (app / claude.ai):** subí la carpeta `.claude/skills/router-cnc-fusion` como skill (Configuración → Capacidades → Skills), o comprimila en .zip y subila.
+**En Claude (app / claude.ai):** subí la carpeta `.claude/skills/viruta` como skill (Configuración → Capacidades → Skills), o comprimila en .zip y subila.
 
 **En Claude Code:** cloná el repo y abrí Claude Code en la carpeta; el agente y la skill se cargan solos. También podés copiar `.claude/agents` y `.claude/skills` a `~/.claude/` para tenerlos en todos tus proyectos.
 
 **Scripts sueltos** (Python 3, sin dependencias):
 
 ```bash
-python .claude/skills/router-cnc-fusion/scripts/limpiar_gcode.py carpeta_con_tap -o carpeta_salida
-python .claude/skills/router-cnc-fusion/scripts/revisar_gcode.py carpeta_salida/1_PATA.txt --diametro 6 --espesor 9
+python .claude/skills/viruta/scripts/limpiar_gcode.py carpeta_con_tap -o carpeta_salida
+python .claude/skills/viruta/scripts/revisar_gcode.py carpeta_salida/1_PATA.txt --diametro 6 --espesor 9
 ```
 
 > Los avances y tiempos son estimados: validalos siempre con el profe y en la máquina.
+
+## Licencia
+
+© 2026 María Sol Segovia Sánchez. Viruta se publica bajo la **[PolyForm Noncommercial License 1.0.0](LICENSE.md)**.
+
+En criollo:
+
+- ✅ **Podés** usarlo, copiarlo, estudiarlo y modificarlo para uso **personal, educativo o de investigación**. Universidades, escuelas y talleres educativos lo pueden usar libremente.
+- ✅ Si lo compartís o hacés una versión modificada, tenés que **mantener la licencia y el aviso de autoría** (`Required Notice`).
+- ❌ **No** se puede usar con **fines comerciales** (venderlo, cobrar por un servicio basado en él, integrarlo en un producto pago) sin un permiso por escrito de la autora.
+
+¿Querés usarlo comercialmente o colaborar? Escribime por GitHub ([@sandaviar](https://github.com/sandaviar)) y lo hablamos.
+
+## Cómo colaborar
+
+Las sugerencias son bienvenidas: abrí un **Issue** en este repo contando qué probaste, qué pasó y qué te gustaría mejorar. Los cambios se revisan antes de incorporarse.

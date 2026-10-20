@@ -1,9 +1,9 @@
 ---
-name: router-cnc-fusion
+name: viruta
 description: Genera código G para router CNC desde Fusion 360 (CAM 2D de piezas planas) y revisa .txt de código G. Pregunta primero si se corta en el Taller 5 de UNAHUR (DDCS V4.1, post Mach3, S18000, F2000, origen abajo-izquierda en la cara superior, 4 pestañas) o en otra máquina, y qué fresa se usa.
 ---
 
-# Router CNC — de Fusion 360 a código G (perfil Taller 5 UNAHUR)
+# Viruta — de Fusion 360 a código G para router CNC
 
 Skill para pasar piezas planas modeladas en Fusion 360 a archivos de código G listos para un router CNC. Trae cargado el perfil de la máquina del **Taller 5 de UNAHUR** (indicaciones de los videos de la cátedra, hechos en SolidWorks CAM, traducidas a Fusion y verificadas en la máquina). Para otros talleres, se arma el perfil preguntando.
 
@@ -142,3 +142,7 @@ Planilla "Organizador de tareas — Lista de cortes para Routers CNC": por pieza
 - Vistas de plano "torcidas": hacer un diseño con las piezas acostadas en plano.
 - SolidWorks CAM: el perímetro exterior es rasgo **Macho** (si es **Cajera**, corte y pestañas quedan por dentro); usar **Actualizar**, nunca Regenerar; editar un rasgo no actualiza las operaciones (borrarlas y Generar plan de operaciones). Si X no puede quedar en el lado corto con Z arriba, rotar la pieza 90° (Insertar → Operaciones → Mover/Copiar).
 - Tiempo calculado ≠ tiempo de máquina: el DDCS del Taller 5 corre a F2000 aunque el código pida F1200.
+
+---
+
+Viruta — © 2026 María Sol Segovia Sánchez (https://github.com/sandaviar). Licencia PolyForm Noncommercial 1.0.0 (ver LICENSE.md): uso personal, educativo y de investigación permitido; uso comercial solo con permiso escrito de la autora.

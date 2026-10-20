@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Viruta — Copyright (c) 2026 María Sol Segovia Sánchez. PolyForm Noncommercial 1.0.0 (ver LICENSE.md).
 """Revisa un archivo de código G para el router CNC de UNAHUR.
 
 Chequea: línea inicial, origen XY (esquina inferior izquierda), origen Z (cara

@@ -1,3 +1,4 @@
+# Viruta — Copyright (c) 2026 María Sol Segovia Sánchez. PolyForm Noncommercial 1.0.0 (ver LICENSE.md).
 """Genera trayectorias y postprocesa con Mach3 todas las configuraciones del diseño activo de Fusion 360.
 
 Cómo usarlo:
