@@ -125,9 +125,9 @@ Si la persona pide "entrá a mi Fusion y sacá el código G" y hay acceso a su c
 
 Si no hay acceso a Fusion, guiá a la persona paso a paso con `references/fusion-pasos.md`.
 
-### Si los scripts no están junto a la skill
+### Si los scripts o las referencias no están junto a la skill
 
-Si la skill se instaló sin la carpeta `scripts/`, descargalos del repositorio oficial y usalos desde ahí:
+Si la skill se instaló sin las carpetas `scripts/` o `references/`, leelas del repositorio oficial (`https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/references/` + `reglas-router-unahur.md`, `fusion-pasos.md` o `fresas.md`) y descargá los scripts de ahí:
 - `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/limpiar_gcode.py`
 - `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/revisar_gcode.py`
 - `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/fusion_postprocesar.py`
