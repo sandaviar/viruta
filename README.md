@@ -4,11 +4,11 @@
 
 Viruta es una skill y un agente para Claude que te acompaña desde la pieza modelada hasta el archivo listo para el pendrive: arma el CAM en Fusion 360, ubica el origen, elige pasadas y pestañas, postprocesa, limpia el archivo y revisa que el código G no tenga errores antes de cortar.
 
-Nació en el **Taller 5 de la Universidad Nacional de Hurlingham (UNAHUR)** como herramienta para estudiantes de Diseño Industrial, y trae cargado el perfil de esa máquina. También sirve para otros talleres: Viruta te pregunta los datos de tu router y arma el perfil con vos.
+Viruta es un **proyecto personal y de autoría de María Sol Segovia Sánchez**. Trae cargado, como primer perfil, el de la máquina del **Taller 5 de la Universidad Nacional de Hurlingham (UNAHUR)**, para que lo puedan usar los estudiantes que cortan ahí. También sirve para otros talleres: Viruta te pregunta los datos de tu router y arma el perfil con vos.
 
 Antes de empezar, Viruta pregunta **si vas a cortar en el Taller 5 de UNAHUR**: si es así usa las reglas de esa máquina (abajo); si es otra máquina, te pregunta sus datos (controlador, origen, rpm, avances, sujeción) y arma el perfil con vos. También **pregunta qué fresa vas a usar** y adapta pasadas, descargas y avances a esa fresa (por defecto, la del taller: Ø6 mm plana, metal duro, 2 filos).
 
-**Autora:** María Sol Segovia Sánchez ([@sandaviar](https://github.com/sandaviar)) — Licenciatura en Diseño Industrial, UNAHUR.
+**Autora y titular de los derechos:** María Sol Segovia Sánchez ([@sandaviar](https://github.com/sandaviar)).
 
 ## Qué hace
 
@@ -68,16 +68,16 @@ python .claude/skills/viruta/scripts/revisar_gcode.py carpeta_salida/1_PATA.txt 
 
 ## Licencia
 
-© 2026 María Sol Segovia Sánchez. Viruta se publica bajo la **[PolyForm Noncommercial License 1.0.0](LICENSE.md)**.
+© 2026 María Sol Segovia Sánchez. Viruta se publica bajo la **[PolyForm Strict License 1.0.0](LICENSE.md)**.
 
 En criollo:
 
-- ✅ **Podés** usarlo, copiarlo, estudiarlo y modificarlo para uso **personal, educativo o de investigación**. Universidades, escuelas y talleres educativos lo pueden usar libremente.
-- ✅ Si lo compartís o hacés una versión modificada, tenés que **mantener la licencia y el aviso de autoría** (`Required Notice`).
-- ❌ **No** se puede usar con **fines comerciales** (venderlo, cobrar por un servicio basado en él, integrarlo en un producto pago) sin un permiso por escrito de la autora.
+- ✅ **Podés usarlo** para uso **personal, educativo o de investigación**: descargarlo, instalarlo en tu Claude y usarlo para tus cortes. Universidades, escuelas y talleres educativos lo pueden usar libremente.
+- ❌ **No** se puede **modificar**, hacer versiones propias ni **redistribuir copias** (subirlo a otro lado, pasarlo en otro repo, etc.). La única versión válida es la de este repositorio.
+- ❌ **No** se puede usar con **fines comerciales** (venderlo, cobrar por un servicio basado en él, integrarlo en un producto pago).
 
-¿Querés usarlo comercialmente o colaborar? Escribime por GitHub ([@sandaviar](https://github.com/sandaviar)) y lo hablamos.
+Para cualquier cosa fuera de esto (adaptarlo, redistribuirlo o usarlo comercialmente) hace falta un **permiso por escrito de la autora**. Escribime por GitHub ([@sandaviar](https://github.com/sandaviar)).
 
 ## Cómo colaborar
 
-Las sugerencias son bienvenidas: abrí un **Issue** en este repo contando qué probaste, qué pasó y qué te gustaría mejorar. Los cambios se revisan antes de incorporarse.
+Las sugerencias son bienvenidas: abrí un **Issue** en este repo contando qué probaste, qué pasó y qué te gustaría mejorar. La autora decide qué se incorpora y es quien hace los cambios.

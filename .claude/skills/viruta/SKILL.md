@@ -113,9 +113,24 @@ Hay dos caminos: guiar a la persona paso a paso en su Fusion, o hacerlo directam
 8. **Revisar** cada `.txt` con `scripts/revisar_gcode.py` (en el Taller 5: `--avance 2000`).
 9. Entregar los `.txt` (y guardarlos en la carpeta de la persona si hay una conectada). Al pendrive van los .txt, **no** el .SET ni el .tap original.
 
-### Automatizar con la API de Fusion
+### Hacerlo directo en el Fusion de la persona
 
-Si hay acceso a la API (por ejemplo `fusion_execute`), `scripts/fusion_postprocesar.py` genera las trayectorias de todas las configuraciones y las postprocesa a una carpeta (cambiar `POST` si la máquina no es la del Taller 5). Preferí que la configuración y las operaciones existan (hechas a mano o por la persona) y usá el script para regenerar y postprocesar en lote.
+Si la persona pide "entrá a mi Fusion y sacá el código G" y hay acceso a su computadora (herramienta de Fusion como `fusion_execute`, o control del equipo):
+
+1. Si ya dijo dónde corta y qué fresa usa, no lo vuelvas a preguntar. Preguntá solo lo que falte y **en qué carpeta y con qué nombre** guardar los archivos (sugerí una carpeta con el nombre del proyecto, ej. `Codigo G <Proyecto>`, y archivos `1_PIEZA.txt`, `2_PIEZA.txt`…).
+2. Abrí el diseño activo, identificá las piezas (cuerpos) y, si no hay configuraciones de FABRICACIÓN, crealas vos con el perfil elegido (una por pieza: orientación, origen, stock, herramienta, operaciones internas, contorno exterior con pestañas). Si ya existen, revisalas contra el perfil y corregí lo que no cumpla.
+3. Mostrá a la persona (captura) dónde quedan el origen y las pestañas antes de postprocesar.
+4. Generá y postprocesá (`scripts/fusion_postprocesar.py` sirve para regenerar y postprocesar en lote; cambiá `POST` si no es la máquina del Taller 5), limpiá con `limpiar_gcode.py`, revisá con `revisar_gcode.py` y guardá los `.txt` finales en la carpeta pedida.
+5. Contá en una línea qué archivos quedaron y dónde.
+
+Si no hay acceso a Fusion, guiá a la persona paso a paso con `references/fusion-pasos.md`.
+
+### Si los scripts no están junto a la skill
+
+Si la skill se instaló sin la carpeta `scripts/`, descargalos del repositorio oficial y usalos desde ahí:
+- `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/limpiar_gcode.py`
+- `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/revisar_gcode.py`
+- `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/fusion_postprocesar.py`
 
 ## Revisión de un código G que trae la persona
 
@@ -145,4 +160,4 @@ Planilla "Organizador de tareas — Lista de cortes para Routers CNC": por pieza
 
 ---
 
-Viruta — © 2026 María Sol Segovia Sánchez (https://github.com/sandaviar). Licencia PolyForm Noncommercial 1.0.0 (ver LICENSE.md): uso personal, educativo y de investigación permitido; uso comercial solo con permiso escrito de la autora.
+Viruta — © 2026 María Sol Segovia Sánchez (https://github.com/sandaviar). Licencia PolyForm Strict 1.0.0 (ver LICENSE.md): uso personal, educativo y de investigación permitido; no se permite modificar, redistribuir ni usar comercialmente sin permiso escrito de la autora.

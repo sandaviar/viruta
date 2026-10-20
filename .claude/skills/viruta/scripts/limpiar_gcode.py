@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Viruta — Copyright (c) 2026 María Sol Segovia Sánchez. PolyForm Noncommercial 1.0.0 (ver LICENSE.md).
+# Viruta — Copyright (c) 2026 María Sol Segovia Sánchez. PolyForm Strict 1.0.0 (ver LICENSE.md).
 """Limpia el código G postprocesado (Mach3) para el router CNC de UNAHUR.
 
 Equivale a la limpieza que pide la cátedra:
