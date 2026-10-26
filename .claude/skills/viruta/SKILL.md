@@ -9,6 +9,8 @@ Viruta pasa piezas planas (2,5D) a archivos de código G listos para el router. 
 
 Hablá con la persona en español rioplatense (voseo). Nombres de menús en español.
 
+Repositorio oficial (referencias y scripts): https://github.com/sandaviar/viruta
+
 ## Paso 0 — Preguntar SIEMPRE antes de empezar
 
 Con AskUserQuestion si está disponible (todo junto, y sin repetir lo que la persona ya dijo):
@@ -174,7 +176,7 @@ Para varias fresas, descargas automáticas, pestañas en lugares exactos, copias
 
 ## Flujo en Fusion — CAM en FABRICACIÓN (opcional)
 
-Si la persona quiere hacerlo en el CAM de Fusion (o aprender a hacerlo), guiala con `references/fusion-pasos.md`; con acceso a su Fusion (conector Autodesk Fusion o `fusion_execute`) podés armarlo vos. Resumen con [valores del perfil]:
+Si la persona quiere hacerlo en el CAM de Fusion (o aprender a hacerlo), guiala con `references/fusion-pasos.md`; con acceso a su Fusion (conector Autodesk Fusion o `fusion_execute`) podés armarlo vos. Si ya hay configuraciones de FABRICACIÓN, revisalas contra el perfil y corregí lo que no cumpla; mostrá (captura) dónde quedan el origen y las pestañas antes de postprocesar. Resumen con [valores del perfil]:
 
 1. Un cuerpo por pieza, apoyado plano. **FABRICACIÓN → CONFIGURACIÓN → Nueva configuración** por pieza: fresado 3 ejes; orientación Z = cara superior arriba, X = [lado corto]; origen [cara de arriba, esquina abajo-izquierda]; stock caja relativa, desfase superior 0.
 2. Herramienta elegida; [husillo 18000, avance 2000, entrada 2000].
@@ -211,9 +213,11 @@ Si la skill se instaló sin `scripts/` o `references/`, bajalos del repositorio 
 - Descargas dibujadas **fuera** de la ranura: la fresa no puede entrar. Van hacia adentro (o `--descargas`).
 - STEP con superficies sueltas o mallas: no hay sólido. Pedí exportar sólidos (en Rhino `_Cap` / `_Join`; en SolidWorks/Fusion exportar el cuerpo sólido).
 - Nombres genéricos ("Cuerpo1", "Saliente-Extruir1", "Body2"): Viruta usa el nombre de la pieza o del archivo. Si la persona quiere otro nombre, que renombre el cuerpo/componente o usá `--nombre` (un solo archivo).
-- SolidWorks CAM: el perímetro exterior es rasgo **Macho**; usar **Actualizar**, nunca Regenerar.
+- Cortes de extrusión que parten piezas al reposicionar descargas: reconstruir limpio en vez de parchar.
+- SolidWorks CAM: el perímetro exterior es rasgo **Macho** (si es **Cajera**, corte y pestañas quedan por dentro); usar **Actualizar**, nunca Regenerar; editar un rasgo no actualiza las operaciones (borrarlas y Generar plan de operaciones). Si X no puede quedar en el lado corto con Z arriba, rotar la pieza 90° (Insertar → Operaciones → Mover/Copiar).
 - Tiempo calculado ≠ tiempo de máquina: el DDCS del Taller 5 corre a F2000 aunque el código pida otra cosa.
 - Rhino en **Modo seguro**: no carga el conector. Rhino en español: comandos con `_`; desde el conector, comandos con guion (`_-Export`, `_-SelName`) para que no abran diálogos.
+- El conector de Rhino puede abrir **otra ventana de Rhino** si no encuentra una conectada: abrí ahí el archivo de la persona (`open_doc`) o pedile que lo abra en el Rhino con el conector activo.
 - Conector de SolidWorks en español: crear piezas o croquis nuevos puede fallar (plantillas y planos en inglés); exportar funciona.
 
 ---
