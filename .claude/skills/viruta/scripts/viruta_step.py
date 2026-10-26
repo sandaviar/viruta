@@ -1266,7 +1266,9 @@ def juntar_piezas(a, cfg):
         base = a.nombre if (a.nombre and len(a.step) == 1) else os.path.splitext(os.path.basename(path))[0]
         if not sols:
             print("AVISO: %s no tiene sólidos cerrados (exportá sólidos, no superficies)." % path)
-        for n, s in sols:
+        for i, (n, s) in enumerate(sols, 1):
+            if a.nombre and len(a.step) == 1:  # el nombre pedido manda
+                n = a.nombre if len(sols) == 1 else "%s_%s" % (a.nombre, n or i)
             crudas.append((n or base, s))
     if filtro:
         crudas = [(n, s) for n, s in crudas if _raiz(n) in filtro or n.lower() in filtro]
