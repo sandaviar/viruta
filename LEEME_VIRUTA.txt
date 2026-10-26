@@ -1,15 +1,20 @@
 ==============================================================
-  VIRUTA — de Fusion 360 o Rhino 8 a código G para router CNC
+  VIRUTA — de cualquier programa a código G para router CNC
   Instructivo completo
 ==============================================================
 
 Repositorio oficial: https://github.com/sandaviar/viruta
 Autora: María Sol Segovia Sánchez (https://github.com/sandaviar)
 
-Viruta es una skill para Claude. Le pedís el código G de tus
-piezas y Claude lo arma siguiendo las reglas del router del
-Taller 5 de UNAHUR (o de la máquina que le digas), lo revisa y
-te deja el archivo .txt listo para el pendrive.
+Viruta es una skill para Claude. Abrís tu pieza en el programa
+que uses (SolidWorks, Fusion, Rhino, Inventor, Onshape,
+FreeCAD...), le pedís el código G a Claude y te devuelve un
+archivo .txt por pieza, armado con las reglas de tu máquina y
+tu fresa, y verificado contra tu modelo antes de cortar.
+
+Trae cargado el perfil del router del Taller 5 de UNAHUR. Si
+cortás en otra máquina, Claude te pregunta sus datos y arma el
+perfil con vos.
 
 
 --------------------------------------------------------------
@@ -25,23 +30,26 @@ te deja el archivo .txt listo para el pendrive.
                             (para Claude Code o para mirarla):
      SKILL.md                 instrucciones de la skill
      LICENSE.md               licencia
-     references\              reglas del taller, pasos de Fusion,
-                              cómo adaptar a otra fresa
+     references\              reglas del taller, cómo sacar el
+                              STEP de cada programa, pasos de
+                              Fusion, cómo adaptar a otra fresa
      scripts\
-       rhino_gcode.py         genera el código G dentro de Rhino
+       viruta_step.py         EL MOTOR: STEP -> código G, para
+                              cualquier programa
        verificar_gcode.py     simula el corte y lo compara con
                               el modelo
        revisar_gcode.py       revisa un .txt (origen, pasadas,
                               pestañas, tiempo)
-       limpiar_gcode.py       limpia lo que sale de Fusion
+       rhino_gcode.py         genera el código G dentro de Rhino
+       limpiar_gcode.py       limpia lo que sale del CAM de Fusion
        fusion_postprocesar.py postprocesa en lote desde Fusion
 
-  Pruebas para la maquina\  Tres códigos G ya verificados, para
+  Pruebas para la maquina\  Códigos G ya verificados, para
                             probar el router (ver al final).
 
 
 ==============================================================
- PARTE 1 — INSTALAR LA SKILL
+ PARTE 1 — INSTALAR LA SKILL (una sola vez)
 ==============================================================
 
 OPCIÓN A — Claude web o app de escritorio (lo más común)
@@ -72,97 +80,84 @@ PROBAR QUE ANDA
 
 
 ==============================================================
- PARTE 2 — SI MODELÁS EN FUSION 360
+ PARTE 2 — PEDIR EL CÓDIGO G (con cualquier programa)
 ==============================================================
 
-  1. Abrí tu diseño en Fusion: un cuerpo por pieza, acostado.
-  2. Pedile a Claude, por ejemplo:
-       "Tengo un banquito en Fusion, lo corto en el Taller 5
-        en MDF 9 mm. Guiame para sacar el código G."
-  3. Claude te guía en FABRICACIÓN paso a paso: configuración
-     por pieza, origen, fresa, operaciones (primero lo interno,
-     el contorno al final con pestañas), simulación y
-     postprocesado Mach3.
-     Si Claude tiene acceso a tu Fusion, lo puede hacer él.
-  4. Claude limpia y revisa cada archivo y te deja un .txt por
-     pieza.
+2.1  LA FORMA MÁS SIMPLE (sirve siempre, sin instalar nada más)
 
+  1. En tu programa, exportá la pieza (o todas las piezas
+     juntas) a STEP:
+       SolidWorks:  Archivo -> Guardar como -> STEP AP214
+       Fusion:      Archivo -> Exportar -> STEP (*.stp)
+       Rhino:       Archivo -> Exportar selección -> STEP
+       Inventor:    Archivo -> Exportar -> Formato CAD -> STEP
+       Onshape:     clic derecho en el Part Studio -> Exportar
+                    -> STEP
+       FreeCAD:     Archivo -> Exportar -> STEP
+       Otros:       cualquier "Exportar" a STEP o IGES.
+  2. Adjuntá el STEP en el chat de Claude y pedile, por ejemplo:
+       "Sacame el código G de estas piezas, para el Taller 5,
+        MDF 9 mm, fresa de 6."
+  3. Claude te devuelve los .txt para descargar.
 
-==============================================================
- PARTE 3 — SI MODELÁS EN RHINO 8 (sin pasar por Fusion)
-==============================================================
+2.2  SIN EXPORTAR A MANO (conectores, app de escritorio)
 
-Claude maneja Rhino, lee tus piezas y escribe el código G
-directo. Hace falta la app de ESCRITORIO de Claude y Rhino 8.
+  Si Claude está conectado a tu programa, exporta él solo: abrís
+  la pieza, le pedís el código G y los .txt te quedan en el
+  Escritorio (o en la carpeta que digas). Necesitás la app de
+  ESCRITORIO de Claude con acceso a tu computadora.
 
-3.1  CONECTAR RHINO CON CLAUDE (se hace una sola vez)
+  - FUSION: en Claude, agregá el conector "Autodesk Fusion"
+    (Configuración -> Conectores). En Fusion: Preferencias ->
+    General -> API -> activá "Fusion MCP Server". Fusion tiene
+    que estar abierto.
+  - RHINO 8: ver PARTE 3 (conector de McNeel).
+  - SOLIDWORKS: servidor MCP de SolidWorks instalado en la
+    computadora y agregado en la configuración de Claude (si
+    querés, pedile a Claude que te guíe; el archivo de
+    configuración lo editás vos). Sirve la versión de
+    estudiante.
+  - Otros programas: exportá el STEP a mano (2.1).
 
-  1. Abrí Rhino 8 NORMALMENTE (desde el ícono). Si en la barra
-     de título dice "Modo seguro", cerralo y abrilo de nuevo:
-     en modo seguro el conector no funciona.
-  2. En la línea de comandos de Rhino escribí:
-        _PackageManager
-     (con el guion bajo adelante si tu Rhino está en español)
-  3. Buscá "Rhino-MCP-Platform" (es de McNeel), tocá Instalar
-     y reiniciá Rhino.
-  4. En Rhino escribí:
-        _MCPConnect
-     Se abre una ventana. Andá a la pestaña "mcp.json" y tocá
-     "Copy".
-  5. En la app de Claude: Configuración -> Desarrollador ->
-     Editar configuración. Se abre el archivo
-     claude_desktop_config.json. Abrilo con el Bloc de notas
-     y agregá el bloque de Rhino. Tiene que quedar así
-     (con tu propia ruta, la que copiaste):
+2.3  QUÉ TE PREGUNTA Y QUÉ TE MUESTRA
 
-       {
-         "mcpServers": {
-           "rhino": {
-             "command": "C:\\Users\\TU_USUARIO\\AppData\\Roaming\\McNeel\\Rhinoceros\\ai\\bin\\rhino-mcp-router.exe"
-           }
-         },
-         ... lo que ya tenía el archivo ...
-       }
+  Claude te pregunta lo que falte:
+    - dónde cortás (Taller 5 u otra máquina),
+    - qué fresa o fresas (ej. 6 mm, o 6 y 3 mm),
+    - material y espesor de la placa.
 
-     Si el archivo ya tenía cosas, pegáselo a Claude en el chat
-     y te devuelve el archivo completo armado.
-     Ojo con las comas: si falta o sobra una, no anda.
-  6. Guardá y cerrá Claude DEL TODO: clic derecho en el ícono
-     de Claude al lado del reloj -> Salir. Volvé a abrirlo.
+  Antes de escribir los archivos te muestra una VISTA PREVIA:
+  una imagen de cada pieza con las profundidades en azul, las
+  trayectorias de la fresa, las pestañas ("P") y el origen
+  (flechas X e Y), y un informe:
+    - medidas de la pieza y cuántas copias iguales hay,
+    - profundidad de cada cajera y rebaje,
+    - agujeros, taladros y pestañas (con su X e Y),
+    - tiempo estimado,
+    - AVISOS: lo que no se puede hacer o conviene revisar.
+  Confirmás o pedís cambios, por ejemplo:
+    "poné 6 pestañas", "las pestañas en los lados largos",
+    "agregá descargas en los encastres",
+    "usá también la fresa de 3 para lo que no entra".
 
-3.2  PREPARAR LA PIEZA EN RHINO
+  Después escribe los .txt y los VERIFICA: simula la fresa
+  sobre la placa y lo compara con tu modelo. Te dice si:
+    - se come material de la pieza (no se entrega así),
+    - queda material sin vaciar,
+    - algún agujero o el contorno no atraviesan la placa,
+    - dónde quedan las pestañas.
 
-  - Cada pieza tiene que ser un SÓLIDO cerrado (polisuperficie
-    cerrada). Si no lo es: _Cap o _Join.
-  - Ponele NOMBRE a cada pieza (Propiedades -> Nombre): ese va
-    a ser el nombre del archivo (ej. ASIENTO.txt). Sin nombre
-    sale pieza_1, pieza_2...
-  - Da igual dónde esté o cómo esté girada: Viruta la acuesta,
-    pone X en el lado corto y el origen donde va.
-  - Si hay encastres, dibujá las descargas (dogbones) en Rhino.
+2.4  QUÉ HACE
 
-3.3  PEDIRLE EL CÓDIGO G
-
-  Con Rhino abierto (normal) y la pieza en pantalla, pedile:
-     "Sacame el código G de las piezas que tengo en Rhino,
-      para el Taller 5, MDF 9 mm, fresa de 6."
-
-  Claude:
-  1. Te pregunta lo que falte (máquina, fresa, placa).
-  2. Te muestra una VISTA PREVIA: dibuja en Rhino las
-     trayectorias en naranja (capa "Viruta") y una "P" en cada
-     pestaña, y te pasa un informe con las profundidades y los
-     avisos. Confirmás o pedís cambios (ej. "poné 6 pestañas").
-  3. Escribe un .txt por pieza en tu Escritorio.
-  4. VERIFICA el código: simula la fresa sobre la placa y lo
-     compara con tu modelo. Te dice si:
-       - se come material de la pieza (no se entrega así),
-       - queda material sin vaciar,
-       - algún agujero no se corta,
-       - dónde quedan las pestañas.
-
-3.4  QUÉ HACE DESDE RHINO
-
+  - Toma todas las piezas del archivo (también ensambles) con
+    su NOMBRE: el nombre del cuerpo, de la pieza o del
+    componente es el nombre del .txt. Ponele nombre a cada
+    pieza en tu programa.
+  - Si hay piezas iguales (ej. 4 patas) hace UN solo archivo y
+    te dice cuántas veces cortarlo. Las espejadas (izquierda y
+    derecha) van aparte.
+  - Da igual dónde esté la pieza o cómo esté girada: la
+    acuesta, pone X en el lado corto y el origen donde va.
   - Cortes pasantes: contorno exterior y agujeros/recortes.
   - Cajeras, rebajes abiertos al borde, escalones y cajeras
     dentro de cajeras, con la PROFUNDIDAD EXACTA del modelo:
@@ -171,31 +166,112 @@ directo. Hace falta la app de ESCRITORIO de Claude y Rhino 8.
   - Entra al material en rampa, sin clavar la fresa.
   - Agujeros del tamaño de la fresa: los taladra.
   - Primero lo interno, el contorno exterior al final, con
-    pestañas en tramos rectos.
+    pestañas en tramos rectos (o donde le digas).
+  - Con dos fresas: la chica hace solo lo que la grande no
+    pudo, en otro archivo (PIEZA_T6.txt y PIEZA_T3.txt).
+  - Si se lo pedís, agrega descargas (dogbones) en las
+    esquinas interiores para que los encastres entren.
+  - Te deja también lista_de_cortes.csv (pieza, medidas,
+    cantidad, fresa, rpm, avance, tiempo) para el organizador.
 
-3.5  QUÉ NO PUEDE HACER (y te avisa)
+2.5  QUÉ NO PUEDE HACER (y te avisa)
 
-  - Zonas más angostas que la fresa (ranuras, agujeros chicos):
-    hace falta una fresa más chica.
+  - Zonas más angostas que la fresa: hace falta una fresa más
+    chica (pedile que use dos fresas).
   - Esquinas interiores vivas: salen redondeadas (radio 3 mm
-    con fresa de 6). Si es un encastre, poné descargas.
+    con fresa de 6), salvo que pidas descargas.
   - Caras inclinadas o curvas (chaflanes, formas 3D): Viruta
     trabaja con paredes verticales y fondos planos.
   - Partes que solo se hacen dando vuelta la placa.
+  - Archivos de malla (STL, OBJ) o dibujos 2D (DXF): hace falta
+    un STEP con sólidos.
+
+2.6  SI CORTÁS EN OTRA MÁQUINA
+
+  Decile a Claude que no es el Taller 5. Te pregunta:
+  controlador (Mach3, DDCS, GRBL, LinuxCNC...), dónde va el
+  cero (esquina o centro; arriba de la placa o sobre la mesa),
+  rpm, avances, pasada, pestañas y extensión del archivo
+  (.txt, .nc, .tap, .gcode). Te muestra la tabla para que la
+  confirmes y la usa en todo.
 
 
 ==============================================================
- PARTE 4 — LLEVARLO A LA MÁQUINA (Taller 5)
+ PARTE 3 — RHINO 8: CONECTAR Y GENERAR DENTRO DE RHINO
 ==============================================================
 
-  - Al pendrive van SOLO los .txt (no .mapa, ni .tap, ni .SET).
+Con el conector de Rhino, Claude lee tus piezas, dibuja las
+trayectorias en Rhino (capa "Viruta") y escribe el código G.
+
+3.1  CONECTAR RHINO CON CLAUDE (una sola vez)
+
+  1. Abrí Rhino 8 NORMALMENTE (desde el ícono). Si en la barra
+     de título dice "Modo seguro", cerralo y abrilo de nuevo.
+  2. En la línea de comandos de Rhino escribí:
+        _PackageManager
+  3. Buscá "Rhino-MCP-Platform" (es de McNeel), tocá Instalar
+     y reiniciá Rhino.
+  4. En Rhino escribí:
+        _MCPConnect
+     Se abre una ventana. Andá a la pestaña "mcp.json" y tocá
+     "Copy".
+  5. En la app de Claude: Configuración -> Desarrollador ->
+     Editar configuración. Abrí claude_desktop_config.json con
+     el Bloc de notas y agregá el bloque de Rhino dentro de
+     "mcpServers" (con tu propia ruta, la que copiaste):
+
+       "rhino": {
+         "command": "C:\\Users\\TU_USUARIO\\AppData\\Roaming\\McNeel\\Rhinoceros\\ai\\bin\\rhino-mcp-router.exe"
+       }
+
+     Si el archivo ya tenía cosas, pegáselo a Claude en el chat
+     y te devuelve el archivo completo armado.
+     Ojo con las comas: si falta o sobra una, no anda.
+  6. Guardá y cerrá Claude DEL TODO: clic derecho en el ícono
+     de Claude al lado del reloj -> Salir. Volvé a abrirlo.
+
+3.2  PREPARAR LA PIEZA
+
+  - Cada pieza tiene que ser un SÓLIDO cerrado (polisuperficie
+    cerrada). Si no lo es: _Cap o _Join.
+  - Ponele NOMBRE a cada pieza (Propiedades -> Nombre).
+
+3.3  PEDIRLE EL CÓDIGO G
+
+  Con Rhino abierto y la pieza en pantalla:
+     "Sacame el código G de las piezas que tengo en Rhino,
+      para el Taller 5, MDF 9 mm, fresa de 6."
+
+
+==============================================================
+ PARTE 4 — SI QUERÉS USAR EL CAM DE FUSION (FABRICACIÓN)
+==============================================================
+
+  Pedile: "Guiame para sacar el código G en el CAM de Fusion".
+  Claude te lleva paso a paso por FABRICACIÓN (configuración,
+  origen, fresa, operaciones, pestañas, simulación y
+  postprocesado Mach3), y después limpia y revisa los archivos.
+  Si tiene el conector de Fusion, lo puede armar él.
+
+
+==============================================================
+ PARTE 5 — LLEVARLO A LA MÁQUINA (Taller 5)
+==============================================================
+
+  - Al pendrive van SOLO los .txt (no .mapa, .png, .csv, .tap
+    ni .SET).
   - Placa: más grande que la pieza; la fresa trabaja hasta 6 mm
-    por fuera del contorno. Dejá unos 10 mm de margen.
+    por fuera del contorno. Dejá unos 10 mm de margen por lado.
   - Origen: cara de ARRIBA de la placa, esquina inferior
     izquierda de la pieza, unos 10 mm hacia adentro del borde
     de la placa.
   - X = lado corto de la pieza, Y = lado largo.
   - DDCS con FRO al 100 %. Corre a F2000.
+  - Si el informe dice "cantidad: 4", cortás ese archivo 4
+    veces (o en 4 placas).
+  - Con dos fresas: primero el archivo _T6 completo, después
+    cambiás la fresa, volvés a tomar el cero de Z y cortás el
+    _T3. ¡No muevas la placa entre los dos!
   - Mostrale el archivo al profe, mirá la primera pasada de
     cerca y tené la mano cerca de la parada de emergencia.
   - Al terminar, cortá las pestañas con trincheta o formón y
@@ -203,60 +279,68 @@ directo. Hace falta la app de ESCRITORIO de Claude y Rhino 8.
 
 
 ==============================================================
- PARTE 5 — REVISAR UN CÓDIGO G QUE YA TENÉS
+ PARTE 6 — REVISAR UN CÓDIGO G QUE YA TENÉS
 ==============================================================
 
   Adjuntale el .txt a Claude y pedile "revisá este código G".
   Te explica en criollo si el origen, la profundidad, las
   pasadas o las pestañas están mal. Sirve para archivos de
-  Fusion, SolidWorks o Rhino.
+  Fusion, SolidWorks CAM o Rhino. Si además le pasás el STEP de
+  la pieza, lo verifica contra el modelo.
 
 
 ==============================================================
  PRUEBAS PARA LA MÁQUINA (carpeta "Pruebas para la maquina")
 ==============================================================
 
-Todas para MDF 9 mm, fresa Ø6 plana, Taller 5. Las tres pasaron
-el verificador y el revisor.
+Todas para MDF 9 mm, Taller 5. Todas pasaron el verificador.
 
-  placa_prueba.txt    Placa 70 × 190 con agujero Ø8.
+  placa_prueba.txt    Placa 70 × 190 con agujero Ø8. Fresa Ø6.
                       Placa mínima: 90 × 210.  Tiempo ≈ 1,5 min.
                       La más simple: ideal para la primera vez.
 
-  pieza_dificil.txt   Pieza 120 × 250 con ranura de encastre,
-                      ventana y cajera redonda de 3 mm.
-                      Placa mínima: 140 × 270.  Tiempo ≈ 3,5 min.
-                      (Su agujerito de Ø4 no sale: es más chico
-                      que la fresa.)
+  pieza_dificil_T6.txt + pieza_dificil_T3.txt
+                      Pieza 120 × 250 con ranura de encastre,
+                      ventana, cajera redonda de 3 mm y
+                      agujerito de Ø4 (lo hace la fresa de 3).
+                      Placa mínima: 140 × 270.
 
-  pieza_cajeras.txt   Pieza 150 × 280 con cajeras de 3, 4,5 y
+  pieza_cajeras_T6.txt + pieza_cajeras_T3.txt
+                      Pieza 150 × 280 con cajeras de 2, 3, 4,5 y
                       6 mm, isla, rebaje al borde, taladro y
-                      ventana.  Placa mínima: 170 × 300.
-                      Tiempo ≈ 11 min.
+                      ventana. La ranura de 4 mm la hace la de 3.
+                      Placa mínima: 170 × 300.
                       Sirve para medir con calibre que las
                       profundidades den justas.
-                      (Su ranura de 4 mm no sale: es más angosta
-                      que la fresa.)
 
-Los tiempos son estimados; en la máquina tardan algo más.
+  Banco (Pata.txt x4, Lateral_izq.txt, Lateral_der.txt,
+  Asiento.txt)        Ensamble de prueba con piezas repetidas,
+                      espejadas y encastres con descargas.
+                      Fresa Ø6.
+
+  Los tiempos de cada archivo están en lista_de_cortes.csv.
+  Son estimados; en la máquina tardan algo más.
 
 
 ==============================================================
  PROBLEMAS FRECUENTES
 ==============================================================
 
+- "No encuentra piezas en mi STEP"
+    -> Exportá SÓLIDOS (no superficies ni mallas). En Rhino:
+       _Cap / _Join. En SolidWorks/Fusion: exportá el cuerpo.
+- "Puso la cara equivocada arriba"
+    -> Decile cuál es la cara de arriba (ej. "la cara que mira
+       a +Z en mi modelo").
+- "Las piezas salen con nombres raros (Cuerpo1, Body2...)"
+    -> Poneles nombre en tu programa antes de exportar.
 - "Comando desconocido: _MCPConnect"
     -> Rhino está en Modo seguro, o no reiniciaste después de
        instalar el paquete. Abrilo normal desde el ícono.
-- "Claude no ve Rhino"
+- "Claude no ve mi programa"
     -> Revisá el claude_desktop_config.json (comas) y cerrá
        Claude del todo (Salir) antes de volver a abrirlo.
-       Rhino tiene que estar abierto.
-- "Se abrió otra ventana de Rhino"
-    -> El conector abre una propia si no encuentra la tuya.
-       Pedile a Claude que abra tu archivo ahí.
-- "No encuentra mis piezas"
-    -> Tienen que ser sólidos cerrados y estar visibles.
+       El programa tiene que estar abierto.
 - "La skill no aparece / Claude no la usa"
     -> Verificá que esté ACTIVADA en Skills, o escribí /viruta.
 - "Me da error al subir el zip"
