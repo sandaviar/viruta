@@ -13,7 +13,8 @@ Antes de empezar, Viruta pregunta **si vas a cortar en el Taller 5 de UNAHUR**: 
 ## Qué hace
 
 - Te guía (o lo hace directamente si tiene acceso a tu Fusion) para armar el CAM: configuración por pieza, origen, herramienta, operaciones, pestañas, simulación y postprocesado Mach3.
-- **Desde Rhino 8, sin Fusion**: con el conector de Rhino (Rhino-MCP-Platform de McNeel) le pedís a Claude el código G y te deja un `.txt` por pieza en el Escritorio. Acomoda la pieza sola (X lado corto, origen abajo-izquierda en la cara superior), corta primero lo interno y el contorno al final con pestañas en tramos rectos, te muestra las trayectorias en Rhino antes de escribir y avisa esquinas vivas, agujeros más chicos que la fresa y cajeras (solo hace cortes pasantes).
+- **Desde Rhino 8, sin Fusion**: con el conector de Rhino (Rhino-MCP-Platform de McNeel) le pedís a Claude el código G y te deja un `.txt` por pieza en el Escritorio. Acomoda la pieza sola (X lado corto, origen abajo-izquierda en la cara superior) y mecaniza en 2,5D con las **profundidades exactas del modelo**: cajeras, rebajes abiertos al borde, islas, escalones, agujeros (o taladrado si son del tamaño de la fresa) y el contorno al final con pestañas. Entra en rampa, te muestra las trayectorias en Rhino antes de escribir y avisa lo que no se puede hacer (zonas más angostas que la fresa, esquinas vivas, caras inclinadas).
+- **Verifica el código contra el modelo**: simula la fresa sobre la placa y avisa si se come material de la pieza, si queda material sin vaciar, si un agujero no se corta o dónde quedan las pestañas.
 - Limpia los archivos para el pendrive (`.txt` que empieza en `S18000 M3`).
 - Revisa cualquier `.txt` (de Fusion o de SolidWorks CAM) y te avisa si el origen, las profundidades, las pasadas o las pestañas están mal.
 - Ayuda a completar el organizador "Lista de cortes para Routers CNC".
@@ -51,6 +52,7 @@ README.md
       revisar_gcode.py                 ← chequeo de un .txt
       fusion_postprocesar.py           ← genera y postprocesa todo desde la API de Fusion
       rhino_gcode.py                   ← código G directo desde Rhino 8 (corre dentro de Rhino)
+      verificar_gcode.py               ← simula el código G y lo compara con el modelo
 ```
 
 ## Cómo usarlo
@@ -66,6 +68,7 @@ README.md
 ```bash
 python .claude/skills/viruta/scripts/limpiar_gcode.py carpeta_con_tap -o carpeta_salida
 python .claude/skills/viruta/scripts/revisar_gcode.py carpeta_salida/1_PATA.txt --diametro 6 --espesor 9
+python .claude/skills/viruta/scripts/verificar_gcode.py PIEZA.txt PIEZA.mapa --diametro 6 --espesor 9   # necesita numpy y scipy
 ```
 
 > Los avances y tiempos son estimados: validalos siempre con el profe y en la máquina.
