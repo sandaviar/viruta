@@ -37,6 +37,7 @@ Antes de empezar, Viruta pregunta **si vas a cortar en el Taller 5 de UNAHUR**: 
 
 ```
 LICENSE.md                             ← licencia
+LEEME_VIRUTA.txt                       ← instructivo completo (instalar y usar)
 README.md
 .claude/
   agents/viruta.md          ← el agente (Claude Code)
