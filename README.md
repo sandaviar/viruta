@@ -1,8 +1,8 @@
 # Viruta
 
-**Asistente con IA para pasar piezas de Fusion 360 a código G para router CNC.**
+**Asistente con IA para pasar piezas de Fusion 360 o Rhino 8 a código G para router CNC.**
 
-Viruta es una skill y un agente para Claude que te acompaña desde la pieza modelada hasta el archivo listo para el pendrive: arma el CAM en Fusion 360, ubica el origen, elige pasadas y pestañas, postprocesa, limpia el archivo y revisa que el código G no tenga errores antes de cortar.
+Viruta es una skill y un agente para Claude que te acompaña desde la pieza modelada hasta el archivo listo para el pendrive: arma el CAM en Fusion 360 (o genera el código G directo desde Rhino 8), ubica el origen, elige pasadas y pestañas, postprocesa, limpia el archivo y revisa que el código G no tenga errores antes de cortar.
 
 Viruta es un **proyecto personal y de autoría de María Sol Segovia Sánchez**. Trae cargado, como primer perfil, el de la máquina del **Taller 5 de la Universidad Nacional de Hurlingham (UNAHUR)**, para que lo puedan usar los estudiantes que cortan ahí. También sirve para otros talleres: Viruta te pregunta los datos de tu router y arma el perfil con vos.
 
@@ -13,6 +13,7 @@ Antes de empezar, Viruta pregunta **si vas a cortar en el Taller 5 de UNAHUR**: 
 ## Qué hace
 
 - Te guía (o lo hace directamente si tiene acceso a tu Fusion) para armar el CAM: configuración por pieza, origen, herramienta, operaciones, pestañas, simulación y postprocesado Mach3.
+- **Desde Rhino 8, sin Fusion**: con el conector de Rhino (Rhino-MCP-Platform de McNeel) le pedís a Claude el código G y te deja un `.txt` por pieza en el Escritorio. Acomoda la pieza sola (X lado corto, origen abajo-izquierda en la cara superior), corta primero lo interno y el contorno al final con pestañas en tramos rectos, te muestra las trayectorias en Rhino antes de escribir y avisa esquinas vivas, agujeros más chicos que la fresa y cajeras (solo hace cortes pasantes).
 - Limpia los archivos para el pendrive (`.txt` que empieza en `S18000 M3`).
 - Revisa cualquier `.txt` (de Fusion o de SolidWorks CAM) y te avisa si el origen, las profundidades, las pasadas o las pestañas están mal.
 - Ayuda a completar el organizador "Lista de cortes para Routers CNC".
@@ -49,6 +50,7 @@ README.md
       limpiar_gcode.py                 ← .tap → .txt limpio
       revisar_gcode.py                 ← chequeo de un .txt
       fusion_postprocesar.py           ← genera y postprocesa todo desde la API de Fusion
+      rhino_gcode.py                   ← código G directo desde Rhino 8 (corre dentro de Rhino)
 ```
 
 ## Cómo usarlo
@@ -56,6 +58,8 @@ README.md
 **En Claude (app / claude.ai):** subí la carpeta `.claude/skills/viruta` como skill (Configuración → Capacidades → Skills), o comprimila en .zip y subila.
 
 **En Claude Code:** cloná el repo y abrí Claude Code en la carpeta; el agente y la skill se cargan solos. También podés copiar `.claude/agents` y `.claude/skills` a `~/.claude/` para tenerlos en todos tus proyectos.
+
+**Con Rhino 8:** instalá el conector una vez: en Rhino (abierto normal, no en "Modo seguro") corré `_PackageManager`, instalá **Rhino-MCP-Platform**, reiniciá, corré `_MCPConnect` y copiá lo de la pestaña **mcp.json** en la configuración de la app de escritorio de Claude (Configuración → Desarrollador → Editar configuración). Reiniciá Claude y pedile: *"Sacame el código G de las piezas que tengo en Rhino, para el Taller 5"*. `rhino_gcode.py` también se puede correr a mano desde el ScriptEditor de Rhino.
 
 **Scripts sueltos** (Python 3, sin dependencias):
 
