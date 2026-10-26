@@ -1,11 +1,11 @@
 ---
 name: viruta
-description: Genera código G para router CNC desde Fusion 360 (CAM 2D de piezas planas) y revisa .txt de código G. Pregunta primero si se corta en el Taller 5 de UNAHUR (DDCS V4.1, post Mach3, S18000, F2000, origen abajo-izquierda en la cara superior, 4 pestañas) o en otra máquina, y qué fresa se usa.
+description: Genera código G para router CNC desde Fusion 360 (CAM 2D de piezas planas) o directo desde Rhino 8 (sin Fusion; cortes pasantes, cajeras, rebajes e islas con la profundidad exacta del modelo; deja el .txt en el Escritorio), y revisa y verifica .txt de código G. Pregunta primero si se corta en el Taller 5 de UNAHUR (DDCS V4.1, post Mach3, S18000, F2000, origen abajo-izquierda en la cara superior, 4 pestañas) o en otra máquina, y qué fresa se usa.
 ---
 
-# Viruta — de Fusion 360 a código G para router CNC
+# Viruta — de Fusion 360 o Rhino a código G para router CNC
 
-Skill para pasar piezas planas modeladas en Fusion 360 a archivos de código G listos para un router CNC. Trae cargado el perfil de la máquina del **Taller 5 de UNAHUR** (indicaciones de los videos de la cátedra, hechos en SolidWorks CAM, traducidas a Fusion y verificadas en la máquina). Para otros talleres, se arma el perfil preguntando.
+Skill para pasar piezas planas modeladas en **Fusion 360** o en **Rhino 8** a archivos de código G listos para un router CNC. Trae cargado el perfil de la máquina del **Taller 5 de UNAHUR** (indicaciones de los videos de la cátedra, hechos en SolidWorks CAM, traducidas a Fusion y verificadas en la máquina). Para otros talleres, se arma el perfil preguntando.
 
 Hablá con la persona en español rioplatense (voseo) y usá los nombres de menús de Fusion en español (FABRICACIÓN, CONFIGURACIÓN, 2D, ACCIONES, Postprocesar…).
 
@@ -23,6 +23,8 @@ Con AskUserQuestion si está disponible (las dos preguntas juntas):
 3. Material y filos (metal duro/HSS; 1–3 filos).
 4. Largo de corte (LOC) y largo total: el LOC tiene que superar el espesor de la placa + 0,3 mm.
 5. Material y espesor de la placa (ej. MDF 9 mm).
+
+**C. ¿Dónde está modelada la pieza?** Fusion 360 o Rhino 8 (si no queda claro por el pedido). Rhino → **Flujo en Rhino 8**.
 
 Usá exactamente la fresa que diga la persona. Si corta en el Taller 5 y no sabe, proponé la del taller: **Ø6 mm plana, metal duro, 2 filos, LOC 19, largo total 51** ("6MM CRB 2FL 19 LOC").
 
@@ -77,7 +79,7 @@ Más pestañas si la pieza es angosta y larga, liviana, o si hay que sostener pa
 - En Fusion, ubicarlas con **Posicionamiento: En los puntos** (clic en cada lugar) en vez de por distancia, así quedan donde se eligió.
 - Recortes interiores que son descarte (agujeros, la ranura del cable) normalmente van **sin pestañas**; si son grandes y pueden salir despedidos, conviene ponerles 1 – 2.
 
-Antes de postprocesar, mostrale a la persona dónde quedaron las pestañas (simulación o captura) y confirmá.
+Antes de postprocesar (o de escribir el .txt desde Rhino), mostrale a la persona dónde quedaron las pestañas (simulación o captura) y confirmá.
 
 ## Perfil de otra máquina
 
@@ -131,6 +133,58 @@ Si la skill se instaló sin las carpetas `scripts/` o `references/`, leelas del 
 - `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/limpiar_gcode.py`
 - `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/revisar_gcode.py`
 - `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/fusion_postprocesar.py`
+- `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/rhino_gcode.py`
+- `https://raw.githubusercontent.com/sandaviar/viruta/main/.claude/skills/viruta/scripts/verificar_gcode.py`
+
+## Flujo en Rhino 8 — código G directo, sin Fusion
+
+Si la pieza está modelada en Rhino, Viruta genera el código G **dentro de Rhino** con `scripts/rhino_gcode.py` y deja un `.txt` por pieza en el **Escritorio** (o en la carpeta que pida la persona). No hace falta pasar por Fusion.
+
+### Requisito: conector de Rhino (Rhino MCP de McNeel)
+
+Fijate si tenés herramientas de Rhino (nombres que terminan en `rhino__run_python`, `rhino__get_context`, `rhino__list_objects`, `rhino__get_viewport_image`…; buscalas con ToolSearch "rhino"). Si no están, guiá la instalación (Rhino 8 o más nuevo; Windows o Mac con Apple Silicon):
+
+1. Abrir Rhino 8 **normalmente**. Si en la barra de título dice "Modo seguro", los plugins no cargan: cerrarlo y abrirlo desde el ícono.
+2. Línea de comandos: `_PackageManager` (con guion bajo si Rhino está en español) → buscar **Rhino-MCP-Platform** (McNeel) → Instalar → reiniciar Rhino.
+3. `_MCPConnect` → pestaña **mcp.json** → Copy.
+4. App de escritorio de Claude: **Configuración → Desarrollador → Editar configuración** → sumar `"mcpServers": { "rhino": { "command": "...rhino-mcp-router.exe" } }` al `claude_desktop_config.json`. Si el archivo ya tiene contenido, agregarlo como clave nueva sin romper las comas (ofrecé armar el archivo completo si la persona lo pega). Esa carpeta está protegida: la edita la persona, no Claude.
+5. Cerrar Claude del todo (ícono junto al reloj → Salir) y volver a abrirlo.
+
+### Pasos
+
+1. **Paso 0** como siempre (dónde corta, fresa, placa).
+2. **Ver qué hay**: `get_context` y `list_objects` (geometryType brep). Cada polisuperficie cerrada visible es una pieza. Si hay piezas que no van al router, preguntá cuáles. El nombre del objeto en Rhino es el nombre del archivo (si no tiene, sale `pieza_N`).
+3. **Cargar el script**: leé `scripts/rhino_gcode.py` y pasalo **completo** a `run_python`, con una línea `CFG = {...}` al principio. Si hay acceso a una carpeta de la computadora, es más cómodo copiar el script ahí una vez y correrlo con `exec(compile(open(ruta).read(), "rhino_gcode.py", "exec"), {"__rhino_doc__": __rhino_doc__, "__name__": "__main__", "CFG": {...}})` (cambiá en algo el texto de cada llamada: el conector puede devolver el resultado anterior si el script es idéntico). Claves de CFG (todas opcionales; por defecto, perfil Taller 5):
+   - `diametro` (6), `husillo` (18000), `avance` (2000), `avance_bajada` (2000), `paso` (50 % Ø), `paso_lateral` (vaciado, 40 % Ø), `rampa_grados` (10), `extra` (0,3), `z_seguro` (10), `z_libre` (2)
+   - `pestanas` (cantidad; por defecto según la tabla de **Pestañas**), `pestana_largo` (8), `pestana_alto` (≈ 1/3 del espesor)
+   - `nombres` (lista de nombres de objeto a procesar; por defecto todas)
+   - `carpeta` (por defecto el Escritorio de la persona)
+   - `escribir` (True/False), `dibujar` (True: trayectorias y pestañas "P" en la capa "Viruta") y `mapa_alturas` (paso en mm, ej. 0,5: escribe `NOMBRE.mapa` para verificar)
+4. **Vista previa** primero: `CFG = {"escribir": False, "dibujar": True, ...}`. Mostrá con `get_viewport_image` (vista superior, sombreado) las trayectorias y las pestañas, y pasá el informe: medidas en X/Y, profundidades de cajeras y rebajes, pestañas con sus X/Y y **todos los AVISOS**. Confirmá con la persona (cantidad y lugar de pestañas, esquinas vivas, zonas que no se pueden hacer).
+5. **Generar**: mismo CFG con `"escribir": True` y `"mapa_alturas": 0.5`. El script escribe `NOMBRE.txt` con fin de línea Windows, ya limpio (arranca en `S18000 M3`, sin comentarios, sin T# M6 ni G28, termina en M5/M30) y `NOMBRE.mapa`.
+6. **Verificar** (si hay acceso a los archivos de la computadora; si no, pedile a la persona que adjunte el `.txt` y el `.mapa`):
+   - `scripts/verificar_gcode.py NOMBRE.txt NOMBRE.mapa --diametro D --espesor E` simula la fresa plana sobre la placa y la compara con el modelo: **material comido** (la fresa baja de más o se mete en la pieza: error grave, no se entrega), **material sobrante** (cajeras sin vaciar; separa las esquinas redondeadas, que son normales), **agujeros pasantes sin cortar**, **pestañas** (cuántas y dónde quedó unida la pieza a la placa) y **rápidos dentro del material**. Necesita numpy y scipy.
+   - `scripts/revisar_gcode.py NOMBRE.txt --diametro D --espesor E --avance 2000`.
+   - Si el verificador marca algo que el generador **no** avisó, no lo entregues como listo: explicá qué pasa.
+7. Contá en una línea qué archivos quedaron y dónde. No dejes los `.mapa` en el pendrive: solo van los `.txt`.
+
+### Qué hace el script
+
+- Acuesta la pieza (la dimensión menor va a Z), la gira para que **X sea el lado corto** y pone el origen en la **esquina inferior izquierda de la cara superior**, esté donde esté la pieza en el modelo.
+- Mecaniza en **2,5D** (paredes verticales y fondos planos), con las **profundidades exactas del modelo**: detecta cada fondo plano (cajeras, rebajes abiertos al borde, escalones, cajeras dentro de cajeras) y baja justo hasta ahí, nunca más.
+- **Cajeras y rebajes**: vacía en zigzag (paso lateral 40 % Ø) y termina con una pasada por la pared, por escalones parejos de hasta el 50 % del Ø, del fondo menos profundo al más profundo. Respeta las **islas** (material que queda en el medio de una cajera) y entra al material **en rampa** (10°), nunca clavando la fresa.
+- **Agujeros y recortes pasantes**: contorno por dentro desde la profundidad que ya se vació (si están en el fondo de una cajera, arrancan desde ahí). Si el agujero es del tamaño de la fresa (Ø a Ø + 0,4), lo **taladra** con picoteo.
+- **Contorno exterior al final**, hasta espesor + 0,3 (MDF 9 → −2,325 / −4,65 / −6,975 / −9,3), con pestañas en los tramos rectos más largos, lejos de muescas y esquinas.
+- Sentido de corte concordante con M3 (contornos exteriores e islas horario; agujeros y cajeras antihorario).
+
+### Límites — avisá siempre
+
+- **Solo 2,5D desde arriba.** Caras inclinadas o curvas (chaflanes, superficies 3D) quedan escalonadas o sin hacer; caras que miran hacia abajo necesitan dar vuelta la placa. El script avisa los dos casos. Para eso, Fusion con estrategias 3D.
+- Cajeras, ranuras o agujeros **más angostos que la fresa** no se pueden hacer: se avisan con su posición (y el verificador los marca como material sobrante o agujero sin cortar). Hace falta una fresa más chica, en otro archivo.
+- **Esquinas interiores vivas** (de contornos, agujeros y cajeras): el script las lista con X/Y. La fresa las deja redondeadas R = Ø/2; si son encastres, hay que agregar **descargas (dogbones)** en Rhino antes de cortar.
+- Grabados de texto o líneas: solo si están modelados como cajera del ancho de la fresa o más.
+- Las curvas salen como tramos rectos cortos (G1): es normal que el archivo tenga miles de líneas si hay cajeras.
+- La pieza tiene que ser una **polisuperficie cerrada**. Si `list_objects` no muestra sólidos, pedí que la cierren (`_Cap`, `_Join`).
 
 ## Revisión de un código G que trae la persona
 
@@ -157,6 +211,9 @@ Planilla "Organizador de tareas — Lista de cortes para Routers CNC": por pieza
 - Vistas de plano "torcidas": hacer un diseño con las piezas acostadas en plano.
 - SolidWorks CAM: el perímetro exterior es rasgo **Macho** (si es **Cajera**, corte y pestañas quedan por dentro); usar **Actualizar**, nunca Regenerar; editar un rasgo no actualiza las operaciones (borrarlas y Generar plan de operaciones). Si X no puede quedar en el lado corto con Z arriba, rotar la pieza 90° (Insertar → Operaciones → Mover/Copiar).
 - Tiempo calculado ≠ tiempo de máquina: el DDCS del Taller 5 corre a F2000 aunque el código pida F1200.
+- Rhino en **Modo seguro**: no carga el plugin del MCP ("Comando desconocido: _MCPConnect"). Abrirlo normal desde el ícono.
+- Rhino en español: los comandos en inglés llevan guion bajo (`_PackageManager`, `_MCPConnect`).
+- El conector de Rhino puede abrir **otra ventana de Rhino** si no encuentra una conectada: abrí ahí el archivo de la persona (`open_doc`) o pedile que lo abra en el Rhino con el MCP activo.
 
 ---
 
